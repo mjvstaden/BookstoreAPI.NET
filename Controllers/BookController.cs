@@ -28,10 +28,10 @@ namespace BookStoreAPI.Controllers
             return await _mongoDBService.GetAsync();
         }
 
-        [HttpGet("{id:length(24)}", Name = "GetBook")]
-        public ActionResult Get(string id)
+        [HttpGet("{id}", Name = "GetBook")]
+        public async Task<ActionResult<Book>> Get(string id)
         {
-            var book = _mongoDBService.GetBook(id);
+            var book = await _mongoDBService.GetBook(id);
 
             if (book == null)
             {
