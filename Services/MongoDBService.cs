@@ -22,23 +22,32 @@ namespace BookStoreAPI.Services
 
         public async Task<Book> GetBook(string id)
         {
-            return await _books.Find<Book>(book => book.Id == id).FirstOrDefaultAsync();
+            foreach (var book in await GetAsync())
+            {
+                if (book.Id == id)
+                {
+                    return book;
+                }
+            }
+            return null;
         }
 
-        public Book CreateBook(Book book)
+        public void CreateBook(BookRequest book)
         {
-            _books.InsertOne(book);
-            return book;
+            var new_book = new Book
+            {
+                title = book.title,
+                author = book.author,
+                genre = book.genre,
+                price = book.price
+            };
+
+            _books.InsertOne(new_book);
         }
 
         public void UpdateBook(string id, Book bookIn)
         {
-            _books.ReplaceOne(book => book.Id == id, bookIn);
-        }
-
-        public void RemoveBook(Book bookIn)
-        {
-            _books.DeleteOne(book => book.Id == bookIn.Id);
+            _books.UpdateOne(book => book.Id == id, new BsonDocument("$set", bookIn.ToBsonDocument()));
         }
 
         public void RemoveBook(string id)

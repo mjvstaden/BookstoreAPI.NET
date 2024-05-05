@@ -28,29 +28,54 @@ namespace BookStoreAPI.Controllers
             return await _mongoDBService.GetAsync();
         }
 
-        [HttpGet("{id}", Name = "GetBook")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Book>> Get(string id)
         {
             var book = await _mongoDBService.GetBook(id);
 
             if (book == null)
             {
-                return NotFound();
+                return NotFound("Book not found!");
             }
 
             return Ok(book);
         }
 
         [HttpPost]
-        public ActionResult Create(Book book)
+        public ActionResult Create(BookRequest book)
         {
-            _mongoDBService.CreateBook(book);
-
-            return CreatedAtRoute("GetBook", new { id = book.Id.ToString() }, book);
+            try 
+            {
+                if (book.title == null || book.author == null || book.genre == null || book.price == 0)
+                {
+                    return BadRequest("Missing required fields!");
+                }
+                _mongoDBService.CreateBook(book);
+            } 
+            catch (Exception e) 
+            {
+                return BadRequest(e.Message);
+            }
+            return Ok("Book created!");
         }
 
         [HttpPut("{id:length(24)}")]
-        public IActionResult Update(string id, Book bookIn)
+        public async Task<IActionResult> Update(string id, BookRequest bookIn)
+        {
+            var book = await _mongoDBService.GetBook(id);
+
+            if (book == null)
+            {
+                return NotFound("Book not found!");
+            }
+
+            _mongoDBService.UpdateBook(id, book);
+
+            return Ok("Book updated!");
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
         {
             var book = _mongoDBService.GetBook(id);
 
@@ -59,24 +84,10 @@ namespace BookStoreAPI.Controllers
                 return NotFound();
             }
 
-            _mongoDBService.UpdateBook(id, bookIn);
+            _mongoDBService.RemoveBook(id);
 
-            return NoContent();
+            return Ok("Book deleted!");
         }
 
-        [HttpDelete("{id:length(24)}")]
-        public IActionResult Delete(string id)
-        {
-            // var book = _mongoDBService.GetBook(id);
-
-            // if (book == null)
-            // {
-            //     return NotFound();
-            // }
-
-            // _mongoDBService.RemoveBook(book.Id);
-
-            return NoContent();
-        }
     }
 }
