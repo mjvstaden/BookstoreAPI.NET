@@ -6,7 +6,7 @@ using BookStoreAPI.Services;
 namespace BookStoreAPI.Controllers
 {
     [Controller]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class BooksController : Controller
     {
         private readonly MongoDBService _mongoDBService;
