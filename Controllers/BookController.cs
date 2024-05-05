@@ -46,7 +46,7 @@ namespace BookStoreAPI.Controllers
         {
             try 
             {
-                if (book.title == null || book.author == null || book.genre == null || book.price == 0)
+                if (book.title == null || book.author == null || book.genre == null || book.price <= 0)
                 {
                     return BadRequest("Missing required fields!");
                 }
@@ -62,7 +62,7 @@ namespace BookStoreAPI.Controllers
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, BookRequest bookIn)
         {
-            if (bookIn.title == null && bookIn.author == null && bookIn.genre == null && bookIn.price == 0)
+            if (bookIn.title == null && bookIn.author == null && bookIn.genre == null && bookIn.price <= 0)
             {
                 return BadRequest("Please enter a field to update");
             }
@@ -101,6 +101,29 @@ namespace BookStoreAPI.Controllers
             _mongoDBService.RemoveBook(id);
 
             return Ok("Book deleted!");
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<List<Book>>> GetBooks(string title = null, string author = null, string genre = null)
+        {
+            if (!string.IsNullOrEmpty(genre))
+            {
+                return Ok(await _mongoDBService.getBookByGenre(genre));
+            }
+            else if (!string.IsNullOrEmpty(title))
+            {
+                var book = await _mongoDBService.getBookByTitle(title);
+                if (book != null)
+                {
+                    return Ok(new List<Book> { book });
+                }
+            }
+            else if (!string.IsNullOrEmpty(author))
+            {
+                return Ok(await _mongoDBService.getBookByAuthor(author));
+            }
+
+            return BadRequest("Please provide a genre, title, or author.");
         }
 
     }

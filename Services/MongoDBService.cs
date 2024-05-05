@@ -54,5 +54,41 @@ namespace BookStoreAPI.Services
         {
             _books.DeleteOne(book => book.Id == id);
         }
+
+        public async Task<Book> getBookByTitle(string title) 
+        {
+            foreach (var book in await GetAsync())
+            {
+                if (book.title.Equals(title, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return book;
+                }
+            }
+            return null;
+        }
+        public async Task<List<Book>> getBookByAuthor(string author) 
+        {
+            List<Book> books = new List<Book>();
+            foreach (var book in await GetAsync())
+            {
+                if (book.author.Equals(author, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    books.Add(book);
+                }
+            }
+            return books;
+        }
+        public async Task<List<Book>> getBookByGenre(string genre) 
+        {
+            List<Book> books = new();
+            foreach (var book in await GetAsync())
+            {
+                if (book.genre.Equals(genre, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    books.Add(book);
+                }
+            }
+            return books;
+        }
     }
 }
