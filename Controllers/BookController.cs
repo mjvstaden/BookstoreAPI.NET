@@ -62,6 +62,11 @@ namespace BookStoreAPI.Controllers
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, BookRequest bookIn)
         {
+            if (bookIn.title == null && bookIn.author == null && bookIn.genre == null && bookIn.price == 0)
+            {
+                return BadRequest("Please enter a field to update");
+            }
+
             var book = await _mongoDBService.GetBook(id);
 
             if (book == null)
@@ -69,7 +74,16 @@ namespace BookStoreAPI.Controllers
                 return NotFound("Book not found!");
             }
 
-            _mongoDBService.UpdateBook(id, book);
+            var book_updated = new Book
+            {
+                Id = id,
+                title = string.IsNullOrEmpty(bookIn.title) ? book.title : bookIn.title,
+                author = string.IsNullOrEmpty(bookIn.author) ? book.author : bookIn.author,
+                genre = string.IsNullOrEmpty(bookIn.genre) ? book.genre : bookIn.genre,
+                price = bookIn.price == 0 ? book.price : bookIn.price
+            };
+
+            _mongoDBService.UpdateBook(id, book_updated);
 
             return Ok("Book updated!");
         }
