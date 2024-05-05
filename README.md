@@ -9,7 +9,7 @@ This is a .NET 8.0 project that provides a RESTful API for a bookstore. It uses 
 
 1. Clone the repository:
 
-```git clone <repository-url>```
+```git clone git@github.com:mjvstaden/BookstoreAPI.NET.git```
 
 2. Navigate to the project directory
 
